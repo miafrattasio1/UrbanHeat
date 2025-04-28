@@ -1,90 +1,15 @@
 {
   "pages": {
-    "/_not-found/page": [
-      "static/chunks/webpack-26fb05195ddee15d.js",
-      "static/chunks/4bd1b696-3178c6ae67992a7e.js",
-      "static/chunks/517-8c7c89a4768b4f95.js",
-      "static/chunks/main-app-c2e9cfb04d80360a.js",
-      "static/chunks/app/_not-found/page-7da96b97768a472b.js"
-    ],
     "/layout": [
-      "static/chunks/webpack-26fb05195ddee15d.js",
-      "static/chunks/4bd1b696-3178c6ae67992a7e.js",
-      "static/chunks/517-8c7c89a4768b4f95.js",
-      "static/chunks/main-app-c2e9cfb04d80360a.js",
-      "static/css/113443fcfe40379c.css",
-      "static/chunks/bc9e92e6-29e5c41e8e35973e.js",
-      "static/chunks/457b8330-3705a48233f42338.js",
-      "static/chunks/2e5b0c64-acb1cb2acd14d42b.js",
-      "static/chunks/836-275aa640d3e6713e.js",
-      "static/chunks/app/layout-7487a29ee221c577.js"
-    ],
-    "/awareness/page": [
-      "static/chunks/webpack-26fb05195ddee15d.js",
-      "static/chunks/4bd1b696-3178c6ae67992a7e.js",
-      "static/chunks/517-8c7c89a4768b4f95.js",
-      "static/chunks/main-app-c2e9cfb04d80360a.js",
-      "static/chunks/app/awareness/page-fb14ff7d56540103.js"
-    ],
-    "/myData/page": [
-      "static/chunks/webpack-26fb05195ddee15d.js",
-      "static/chunks/4bd1b696-3178c6ae67992a7e.js",
-      "static/chunks/517-8c7c89a4768b4f95.js",
-      "static/chunks/main-app-c2e9cfb04d80360a.js",
-      "static/chunks/bc9e92e6-29e5c41e8e35973e.js",
-      "static/chunks/457b8330-3705a48233f42338.js",
-      "static/chunks/2e5b0c64-acb1cb2acd14d42b.js",
-      "static/chunks/836-275aa640d3e6713e.js",
-      "static/chunks/887-468d72133b579fc8.js",
-      "static/chunks/app/myData/page-52b10daf23746836.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/layout.css",
+      "static/chunks/app/layout.js"
     ],
     "/dashboard/page": [
-      "static/chunks/webpack-26fb05195ddee15d.js",
-      "static/chunks/4bd1b696-3178c6ae67992a7e.js",
-      "static/chunks/517-8c7c89a4768b4f95.js",
-      "static/chunks/main-app-c2e9cfb04d80360a.js",
-      "static/chunks/bc9e92e6-29e5c41e8e35973e.js",
-      "static/chunks/457b8330-3705a48233f42338.js",
-      "static/chunks/2e5b0c64-acb1cb2acd14d42b.js",
-      "static/chunks/836-275aa640d3e6713e.js",
-      "static/chunks/887-468d72133b579fc8.js",
-      "static/chunks/app/dashboard/page-c5e229fe7584d9b7.js"
-    ],
-    "/about/page": [
-      "static/chunks/webpack-26fb05195ddee15d.js",
-      "static/chunks/4bd1b696-3178c6ae67992a7e.js",
-      "static/chunks/517-8c7c89a4768b4f95.js",
-      "static/chunks/main-app-c2e9cfb04d80360a.js",
-      "static/chunks/app/about/page-53855746b18a82a7.js"
-    ],
-    "/login/page": [
-      "static/chunks/webpack-26fb05195ddee15d.js",
-      "static/chunks/4bd1b696-3178c6ae67992a7e.js",
-      "static/chunks/517-8c7c89a4768b4f95.js",
-      "static/chunks/main-app-c2e9cfb04d80360a.js",
-      "static/chunks/bc9e92e6-29e5c41e8e35973e.js",
-      "static/chunks/457b8330-3705a48233f42338.js",
-      "static/chunks/2e5b0c64-acb1cb2acd14d42b.js",
-      "static/chunks/836-275aa640d3e6713e.js",
-      "static/chunks/app/login/page-9e233aa2c9c2aa90.js"
-    ],
-    "/register/page": [
-      "static/chunks/webpack-26fb05195ddee15d.js",
-      "static/chunks/4bd1b696-3178c6ae67992a7e.js",
-      "static/chunks/517-8c7c89a4768b4f95.js",
-      "static/chunks/main-app-c2e9cfb04d80360a.js",
-      "static/chunks/bc9e92e6-29e5c41e8e35973e.js",
-      "static/chunks/457b8330-3705a48233f42338.js",
-      "static/chunks/2e5b0c64-acb1cb2acd14d42b.js",
-      "static/chunks/836-275aa640d3e6713e.js",
-      "static/chunks/app/register/page-8948e1fdde4c8b4d.js"
-    ],
-    "/page": [
-      "static/chunks/webpack-26fb05195ddee15d.js",
-      "static/chunks/4bd1b696-3178c6ae67992a7e.js",
-      "static/chunks/517-8c7c89a4768b4f95.js",
-      "static/chunks/main-app-c2e9cfb04d80360a.js",
-      "static/chunks/app/page-7230ba967387c927.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/dashboard/page.js"
     ]
   }
 }

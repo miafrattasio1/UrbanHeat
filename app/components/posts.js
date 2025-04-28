@@ -1,31 +1,8 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
-import { ref, get, child } from "firebase/database";
+import { ref, get } from "firebase/database";
 import { rtdb } from "../../firebase/config";
-
-function groupSensorData(sensorData, timeThreshold = 30000) {
-    let grouped = [];
-    let currentGroup = [];
-
-    sensorData.sort((a, b) => a.timestamp - b.timestamp);
-
-    for (let i = 0; i < sensorData.length; i++) {
-        const reading = sensorData[i];
-
-        if (
-            currentGroup.length === 0 ||
-            Math.abs(reading.timestamp - currentGroup[0].timestamp) <= timeThreshold
-        ) {
-            currentGroup.push(reading);
-        } else {
-            grouped.push(currentGroup);
-            currentGroup = [reading];
-        }
-    }
-
-    if (currentGroup.length > 0) grouped.push(currentGroup);
-    return grouped;
-}
+import Heatmap from "./Heatmap"; // Import the Heatmap component
 
 export default function Posts({ searchTerm = '' }) {
     const [posts, setPosts] = useState([]);
@@ -36,94 +13,95 @@ export default function Posts({ searchTerm = '' }) {
         const fetchData = async () => {
             try {
                 const dbRef = ref(rtdb);
-                const [locationSnap, sensorSnap] = await Promise.all([
-                    get(child(dbRef, "UrbanEnvData")),
-                    get(child(dbRef, "sensor_data/device_001")),
-                ]);
+                const allDataSnap = await get(dbRef);
+                const allData = allDataSnap.val();
 
-                const locationData = locationSnap.val();
-                const sensorRaw = sensorSnap.val();
-
-                if (!locationData || !sensorRaw) {
-                    setError("Location or sensor data is missing.");
+                if (!allData || !allData.sensor_data) {
+                    setError("Sensor data is missing.");
                     setLoading(false);
                     return;
                 }
 
-                // Debug: log the entire locationData object
-                console.log("Location data structure:", locationData);
+                const allSensorTransects = Object.entries(allData.sensor_data || {});
+                const metadataBlocks = Object.entries(allData)
+                    .filter(([key, value]) =>
+                        key !== 'sensor_data' &&
+                        typeof value === 'object' &&
+                        Object.keys(value).some(k => k.startsWith("Email,City,Time"))
+                    );
 
-                // Parse the Email, City, and Time string and extract the values
-                const locationString = locationData?.["Email,City,Time"];
-                let email = "Unknown Email";
-                let city = "Unknown City";
+                let postsCombined = [];
 
-                if (locationString) {
-                    try {
-                        // Parse the string into an array
-                        const locationArray = JSON.parse(locationString);
-                        email = locationArray[0] || "Unknown Email";
-                        city = locationArray[1] || "Unknown City";
-                    } catch (e) {
-                        console.error("Error parsing location string:", e);
-                    }
-                }
+                for (const [transectName, transectData] of allSensorTransects) {
+                    let flatSensor = [];
 
-                // Debug: log the extracted email and city
-                console.log("Email:", email);
-                console.log("City:", city);
-
-                // Parse coordinates and other location info correctly from the database
-                const latLongEntries = Object.entries(locationData)
-                    .filter(([key]) => key.startsWith("Lat,Long,Time"))
-                    .map(([_, value]) => {
-                        // If the value is a string representation of an array, parse it
-                        const [lat, lng, time] = Array.isArray(value) ? value : JSON.parse(value);
-                        return { lat, lng, time };
-                    });
-
-                const findClosestLocation = (timestampSec) => {
-                    const timestampMs = timestampSec * 1000;
-                    let closest = latLongEntries[0];
-                    let minDiff = Math.abs(timestampMs - closest.time);
-
-                    for (const loc of latLongEntries) {
-                        const diff = Math.abs(timestampMs - loc.time);
-                        if (diff < minDiff) {
-                            minDiff = diff;
-                            closest = loc;
+                    for (const sessionId in transectData) {
+                        const session = transectData[sessionId];
+                        for (const pointId in session) {
+                            const entry = session[pointId];
+                            flatSensor.push({ ...entry });
                         }
                     }
 
-                    return {
-                        latitude: closest.lat,
-                        longitude: closest.lng,
-                    };
-                };
+                    if (flatSensor.length === 0) continue;
+                    const representativeTimestamp = flatSensor[0].timestamp;
 
-                let flatReadings = [];
-                for (const session in sensorRaw) {
-                    const sessionData = sensorRaw[session];
-                    for (const key in sessionData) {
-                        const entry = sessionData[key];
-                        const coords = findClosestLocation(entry.timestamp);
-                        flatReadings.push({
-                            ...entry,
-                            ...coords,
-                        });
+                    let bestMatch = null;
+                    let minTimeDiff = Infinity;
+
+                    for (const [metaKey, metaBlock] of metadataBlocks) {
+                        try {
+                            const metaTimeStr = metaBlock["Email,City,Time"];
+                            if (!metaTimeStr) continue;
+                            const metaTimeArr = JSON.parse(metaTimeStr);
+                            const metaTimestamp = metaTimeArr[2];
+                            const timeDiff = Math.abs(representativeTimestamp - metaTimestamp);
+                            if (timeDiff < minTimeDiff) {
+                                minTimeDiff = timeDiff;
+                                bestMatch = metaBlock;
+                            }
+                        } catch (e) {
+                            console.warn("Metadata parsing error", e);
+                        }
                     }
+
+                    if (!bestMatch) continue;
+
+                    const [email, city] = JSON.parse(bestMatch["Email,City,Time"]);
+                    const latLongEntries = Object.entries(bestMatch)
+                        .filter(([k]) => k.startsWith("Lat,Long,Time"))
+                        .map(([_, val]) => {
+                            const [lat, lng, time] = Array.isArray(val) ? val : JSON.parse(val);
+                            return { lat, lng, time };
+                        });
+
+                    const findClosestLocation = (timestamp) => {
+                        let closest = latLongEntries[0];
+                        let minDiff = Math.abs(timestamp - closest.time);
+                        for (const loc of latLongEntries) {
+                            const diff = Math.abs(timestamp - loc.time);
+                            if (diff < minDiff) {
+                                closest = loc;
+                                minDiff = diff;
+                            }
+                        }
+                        return { latitude: closest.lat, longitude: closest.lng };
+                    };
+
+                    const enrichedReadings = flatSensor.map((entry) => ({
+                        ...entry,
+                        ...findClosestLocation(entry.timestamp)
+                    }));
+
+                    postsCombined.push({
+                        id: transectName,
+                        csvData: enrichedReadings,
+                        email,
+                        city
+                    });
                 }
 
-                const grouped = groupSensorData(flatReadings);
-
-                const postsFormatted = grouped.map((group, i) => ({
-                    id: `transect-${i}`,
-                    csvData: group,
-                    email,
-                    city,
-                }));
-
-                setPosts(postsFormatted);
+                setPosts(postsCombined);
             } catch (err) {
                 console.error("Error fetching data:", err);
                 setError("Failed to load posts");
@@ -152,32 +130,32 @@ export default function Posts({ searchTerm = '' }) {
             "Longitude",
             "Temperature (°C)",
             "Humidity (%)",
-            "Altitude (m)",
             "Pressure (hPa)",
             "Gas",
             "Light",
-            "Sound",
-            "Thermo_C",
-            "Thermo_F"
+            "Sound"
         ];
 
         const rows = data.map(obj => {
-            const timestamp = obj.timestamp
-                ? new Date(obj.timestamp * 1000).toISOString()
-                : "";
+            let timestamp = "";
+            if (obj.timestamp && !isNaN(obj.timestamp)) {
+                try {
+                    timestamp = new Date(Number(obj.timestamp)).toISOString();
+                } catch (e) {
+                    timestamp = "";
+                }
+            }
+
             return [
                 timestamp,
                 obj.latitude ?? "",
                 obj.longitude ?? "",
-                obj.temperature ?? "",
-                obj.humidity ?? "",
-                obj.altitude ?? "",
-                obj.pressure ?? "",
-                obj.gas ?? "",
-                obj.light ?? "",
-                obj.sound ?? "",
-                obj.thermo_c ?? "",
-                obj.thermo_f ?? ""
+                obj.T_C ?? "",
+                obj.H ?? "",
+                obj.P ?? "",
+                obj.G ?? "",
+                obj.lgt ?? "",
+                obj.sound ?? ""
             ].join(",");
         });
 
@@ -185,7 +163,7 @@ export default function Posts({ searchTerm = '' }) {
     };
 
     const downloadCSV = (csv, filename) => {
-        const BOM = "\uFEFF"; // Byte Order Mark for Excel compatibility
+        const BOM = "\uFEFF";
         const blob = new Blob([BOM + csv], { type: "text/csv;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -204,14 +182,16 @@ export default function Posts({ searchTerm = '' }) {
                     filteredPosts.map(post => {
                         const previewCSV = generateCSV(post.csvData.slice(0, 3));
                         const fullCSV = generateCSV(post.csvData);
-                        const { latitude, longitude } = post.csvData[0] || {};
-
                         return (
                             <div key={post.id} className="post-card">
                                 <div className="post-header">
                                     <h3>
                                         Transect in {post.city}, {post.email}
                                     </h3>
+                                </div>
+
+                                <div className="csv-preview">
+                                    <Heatmap data={post.csvData} />
                                 </div>
 
                                 <div className="csv-preview">
