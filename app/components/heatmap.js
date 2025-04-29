@@ -1,63 +1,76 @@
-import { useEffect, useRef, useState } from "react";
-import L from "leaflet";
+"use client";
+
+import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 import "leaflet.heat";
+import { useEffect } from "react";
 
-export default function Heatmap({ data }) {
-    const mapRef = useRef(null);
-    const mapInstanceRef = useRef(null);
-    const heatLayerRef = useRef(null);
-    const [isMounted, setIsMounted] = useState(false);
-
-    // Initialize the map once when the component is mounted
-    useEffect(() => {
-        setIsMounted(true);
-
-        return () => {
-            setIsMounted(false);
-        };
-    }, []);
+function HeatLayer({ points }) {
+    const map = useMap();
 
     useEffect(() => {
-        if (!isMounted || !mapRef.current || mapInstanceRef.current) return;
+        if (!points || points.length === 0 || !map) return;
 
-        // Initialize the map only once using the ref
-        mapInstanceRef.current = L.map(mapRef.current, {
-            center: [data[0]?.latitude || 0, data[0]?.longitude || 0],
-            zoom: 13,
-            attributionControl: false,
+        // Normalize intensity values between 0 and 1
+        const maxIntensity = Math.max(...points.map(p => p.intensity ?? 0.6));
+        const heatData = points.map((p) => [
+            p.latitude,
+            p.longitude,
+            (p.intensity ?? 0.6) / maxIntensity
+        ]);
+
+        // Clear old heat layers (but keep the base map tiles)
+        map.eachLayer((layer) => {
+            if (layer.options?.pane === "overlayPane") {
+                map.removeLayer(layer);
+            }
         });
 
-        // Add the tile layer to the map
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: "© OpenStreetMap contributors",
-        }).addTo(mapInstanceRef.current);
-
-        // Initialize heatmap layer
-        const heatData = data.map((item) => [item.latitude, item.longitude, item.T_C]);
-        heatLayerRef.current = L.heatLayer(heatData, { radius: 25 }).addTo(mapInstanceRef.current);
-
-        return () => {
-            if (mapInstanceRef.current) {
-                mapInstanceRef.current.remove();
-                mapInstanceRef.current = null;
-                heatLayerRef.current = null;
+        const heat = window.L.heatLayer(heatData, {
+            radius: 25,
+            blur: 15,
+            maxZoom: 17,
+            gradient: {
+                0.0: "blue",
+                0.4: "lime",
+                0.6: "yellow",
+                0.8: "orange",
+                1.0: "red"
             }
-        };
-    }, [isMounted, data]);
+        });
 
-    // Update heatmap when the data changes
-    useEffect(() => {
-        if (!isMounted || !heatLayerRef.current || !data.length) return;
+        heat.addTo(map);
 
-        const heatData = data.map((item) => [item.latitude, item.longitude, item.T_C]);
-        heatLayerRef.current.setLatLngs(heatData);
+        // Zoom to bounds of heat data
+        const latlngs = heatData.map(([lat, lng]) => [lat, lng]);
+        const bounds = window.L.latLngBounds(latlngs);
+        map.fitBounds(bounds, { padding: [20, 20] });
 
-        // Optionally recenter the map
-        mapInstanceRef.current?.setView(
-            [data[0].latitude, data[0].longitude],
-            13
-        );
-    }, [data, isMounted]);
+    }, [map, points]);
 
-    return <div ref={mapRef} style={{ height: "300px", width: "100%" }} />;
+    return null;
+}
+
+export default function Heatmap({ data }) {
+    if (!data || data.length === 0) return <p>No data available</p>;
+
+    const firstPoint = data[0];
+    const center = [firstPoint.latitude, firstPoint.longitude];
+
+    return (
+        <div style={{ height: "300px", width: "100%" }}>
+            <MapContainer
+                center={center}
+                zoom={15}
+                scrollWheelZoom={false}
+                style={{ height: "100%", width: "100%", borderRadius: "8px" }}
+            >
+                <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                />
+                <HeatLayer points={data} />
+            </MapContainer>
+        </div>
+    );
 }

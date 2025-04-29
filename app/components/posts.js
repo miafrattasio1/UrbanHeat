@@ -1,8 +1,9 @@
 "use client";
+
 import { useEffect, useState, useMemo } from "react";
 import { ref, get } from "firebase/database";
 import { rtdb } from "../../firebase/config";
-import Heatmap from "./Heatmap"; // Import the Heatmap component
+import Heatmap from "./Heatmap";
 
 export default function Posts({ searchTerm = '' }) {
     const [posts, setPosts] = useState([]);
@@ -71,13 +72,26 @@ export default function Posts({ searchTerm = '' }) {
                     const latLongEntries = Object.entries(bestMatch)
                         .filter(([k]) => k.startsWith("Lat,Long,Time"))
                         .map(([_, val]) => {
-                            const [lat, lng, time] = Array.isArray(val) ? val : JSON.parse(val);
-                            return { lat, lng, time };
-                        });
+                            try {
+                                const [lat, lng, time] = Array.isArray(val) ? val : JSON.parse(val);
+                                return { lat, lng, time };
+                            } catch (e) {
+                                return null;
+                            }
+                        })
+                        .filter(entry =>
+                            entry &&
+                            typeof entry.lat === "number" &&
+                            typeof entry.lng === "number" &&
+                            typeof entry.time === "number"
+                        );
 
                     const findClosestLocation = (timestamp) => {
+                        if (!latLongEntries || latLongEntries.length === 0) return null;
+
                         let closest = latLongEntries[0];
                         let minDiff = Math.abs(timestamp - closest.time);
+
                         for (const loc of latLongEntries) {
                             const diff = Math.abs(timestamp - loc.time);
                             if (diff < minDiff) {
@@ -85,13 +99,29 @@ export default function Posts({ searchTerm = '' }) {
                                 minDiff = diff;
                             }
                         }
-                        return { latitude: closest.lat, longitude: closest.lng };
+
+                        return {
+                            latitude: typeof closest.lat === "number" ? closest.lat : null,
+                            longitude: typeof closest.lng === "number" ? closest.lng : null,
+                        };
                     };
 
-                    const enrichedReadings = flatSensor.map((entry) => ({
-                        ...entry,
-                        ...findClosestLocation(entry.timestamp)
-                    }));
+                    const enrichedReadings = flatSensor
+                        .map((entry) => {
+                            const coords = findClosestLocation(entry.timestamp);
+                            if (!coords || coords.latitude === null || coords.longitude === null) {
+                                return null;
+                            }
+
+                            return {
+                                ...entry,
+                                ...coords,
+                                intensity: 0.6,
+                            };
+                        })
+                        .filter((entry) => entry !== null);
+
+                    if (enrichedReadings.length === 0) continue;
 
                     postsCombined.push({
                         id: transectName,
@@ -125,15 +155,9 @@ export default function Posts({ searchTerm = '' }) {
 
     const generateCSV = (data) => {
         const headers = [
-            "Timestamp",
-            "Latitude",
-            "Longitude",
-            "Temperature (°C)",
-            "Humidity (%)",
-            "Pressure (hPa)",
-            "Gas",
-            "Light",
-            "Sound"
+            "Timestamp", "Latitude", "Longitude",
+            "Temperature (°C)", "Humidity (%)", "Pressure (hPa)",
+            "Gas", "Light", "Sound"
         ];
 
         const rows = data.map(obj => {
@@ -141,7 +165,7 @@ export default function Posts({ searchTerm = '' }) {
             if (obj.timestamp && !isNaN(obj.timestamp)) {
                 try {
                     timestamp = new Date(Number(obj.timestamp)).toISOString();
-                } catch (e) {
+                } catch {
                     timestamp = "";
                 }
             }
@@ -180,8 +204,8 @@ export default function Posts({ searchTerm = '' }) {
             <div className="posts-grid">
                 {filteredPosts.length > 0 ? (
                     filteredPosts.map(post => {
-                        const previewCSV = generateCSV(post.csvData.slice(0, 3));
                         const fullCSV = generateCSV(post.csvData);
+
                         return (
                             <div key={post.id} className="post-card">
                                 <div className="post-header">
@@ -190,17 +214,41 @@ export default function Posts({ searchTerm = '' }) {
                                     </h3>
                                 </div>
 
-                                <div className="csv-preview">
+                                <div className="csv-preview heatmap-box">
                                     <Heatmap data={post.csvData} />
                                 </div>
 
-                                <div className="csv-preview">
-                                    <textarea
-                                        value={previewCSV}
-                                        readOnly
-                                        rows={5}
-                                        className="csv-textarea"
-                                    />
+                                <div className="csv-preview table-scroll">
+                                    <table className="csv-table">
+                                        <thead>
+                                        <tr>
+                                            <th>Timestamp</th>
+                                            <th>Latitude</th>
+                                            <th>Longitude</th>
+                                            <th>Temp (°C)</th>
+                                            <th>Humidity (%)</th>
+                                            <th>Pressure (hPa)</th>
+                                            <th>Gas</th>
+                                            <th>Light</th>
+                                            <th>Sound</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {post.csvData.slice(0, 5).map((row, i) => (
+                                            <tr key={i}>
+                                                <td>{new Date(Number(row.timestamp)).toISOString()}</td>
+                                                <td>{row.latitude}</td>
+                                                <td>{row.longitude}</td>
+                                                <td>{row.T_C}</td>
+                                                <td>{row.H}</td>
+                                                <td>{row.P}</td>
+                                                <td>{row.G}</td>
+                                                <td>{row.lgt}</td>
+                                                <td>{row.sound}</td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
                                 </div>
 
                                 <button
@@ -220,13 +268,13 @@ export default function Posts({ searchTerm = '' }) {
             <style jsx>{`
                 .posts-container {
                     padding: 30px;
-                    max-width: 1200px;
+                    max-width: 1400px;
                     margin: 0 auto;
                 }
 
                 .posts-grid {
                     display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+                    grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
                     gap: 30px;
                 }
 
@@ -238,29 +286,58 @@ export default function Posts({ searchTerm = '' }) {
                     display: flex;
                     flex-direction: column;
                     gap: 20px;
+                    overflow: hidden;          
+                    box-sizing: border-box;    
                 }
 
+
                 .post-header {
-                    display: flex;
-                    justify-content: space-between;
                     border-bottom: 1px solid #e0e0e0;
                     padding-bottom: 8px;
                 }
 
-                .csv-preview {
+                .csv-preview.heatmap-box {
+                    height: 300px;
+                    width: 100%;
                     background: #f5f5f5;
                     padding: 10px;
                     border-radius: 8px;
-                    overflow-x: auto;
+                    overflow: hidden;
+                    box-sizing: border-box; /* ✅ Ensures padding stays within width */
                 }
 
-                .csv-textarea {
+
+                .csv-preview.table-scroll {
+                    overflow-x: auto;
+                    background: #f9f9f9;
+                    border: 1px solid #ddd;
+                    padding: 6px;
+                    border-radius: 8px;
+                    height: auto;
+                    min-height: unset;
+                }
+
+                .csv-table {
                     width: 100%;
-                    font-family: monospace;
-                    background: transparent;
-                    border: none;
-                    resize: none;
-                    outline: none;
+                    border-collapse: collapse;
+                    font-size: 0.75rem;
+                }
+
+                .csv-table thead {
+                    background-color: #f0f0f0;
+                }
+
+                .csv-table th,
+                .csv-table td {
+                    padding: 2px 4px;
+                    text-align: left;
+                    border-bottom: 1px solid #ddd;
+                    white-space: nowrap;
+                    line-height: 1.2;
+                }
+
+                .csv-table tr:hover {
+                    background-color: #f1f8ff;
                 }
 
                 .download-btn {
