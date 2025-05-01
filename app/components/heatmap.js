@@ -1,71 +1,88 @@
 "use client";
 
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import "leaflet.heat";
 import { useEffect, useState } from "react";
 
-function HeatLayer({ points }) {
-    const map = useMap();
+// Generate a color gradient with custom color ranges
+const generateGradient = () => {
+    const gradient = [];
 
-    useEffect(() => {
-        if (!points || points.length === 0 || !map) return;
+    // Blues (-10°C to 0°C)
+    for (let i = -10; i <= 0; i++) {
+        const hue = 240 - ((240 - 210) * (i + 10)) / 10; // Blue to light blue
+        gradient.push(`hsl(${hue}, 100%, 50%)`);
+    }
 
-        // Check if window is defined (i.e., client-side)
-        if (typeof window !== "undefined") {
-            // Normalize intensity values between 0 and 1
-            const maxIntensity = Math.max(...points.map(p => p.intensity ?? 0.6));
-            const heatData = points.map((p) => [
-                p.latitude,
-                p.longitude,
-                (p.intensity ?? 0.6) / maxIntensity
-            ]);
+    // Greens (0°C to 10°C)
+    for (let i = 0; i <= 10; i++) {
+        const hue = 120 - ((120 - 60) * i) / 10; // Green to yellow-green
+        gradient.push(`hsl(${hue}, 100%, 50%)`);
+    }
 
-            // Clear old heat layers (but keep the base map tiles)
-            map.eachLayer((layer) => {
-                if (layer.options?.pane === "overlayPane") {
-                    map.removeLayer(layer);
-                }
-            });
+    // Yellows (10°C to 20°C)
+    for (let i = 10; i <= 20; i++) {
+        const hue = 60 - ((60 - 30) * (i - 10)) / 10; // Yellow to yellow-orange
+        gradient.push(`hsl(${hue}, 100%, 50%)`);
+    }
 
-            const heat = window.L.heatLayer(heatData, {
-                radius: 25,
-                blur: 15,
-                maxZoom: 17,
-                gradient: {
-                    0.0: "blue",
-                    0.4: "lime",
-                    0.6: "yellow",
-                    0.8: "orange",
-                    1.0: "red"
-                }
-            });
+    // Oranges (20°C to 30°C)
+    for (let i = 20; i <= 30; i++) {
+        const hue = 30 - ((30 - 0) * (i - 20)) / 10; // Orange to red-orange
+        gradient.push(`hsl(${hue}, 100%, 50%)`);
+    }
 
-            heat.addTo(map);
+    // Reds (30°C to 40°C)
+    for (let i = 30; i <= 40; i++) {
+        const hue = (i - 30) * (360 / 10); // Red to deep red
+        gradient.push(`hsl(${hue}, 100%, 50%)`);
+    }
 
-            // Zoom to bounds of heat data
-            const latlngs = heatData.map(([lat, lng]) => [lat, lng]);
-            const bounds = window.L.latLngBounds(latlngs);
-            map.fitBounds(bounds, { padding: [20, 20] });
-        }
-    }, [map, points]);
+    return gradient;
+};
 
-    return null;
+const temperatureGradient = generateGradient();
+
+const getColor = (tempCelsius) => {
+    if (tempCelsius == null || isNaN(tempCelsius)) return "#888"; // fallback gray
+
+    if (tempCelsius <= -10) return temperatureGradient[0];
+    if (tempCelsius >= 40) return temperatureGradient[temperatureGradient.length - 1];
+
+    const index = Math.round(tempCelsius + 10); // shift -10 to 0, 0 to 10, ..., 40 to 50
+    return temperatureGradient[index];
+};
+
+// Render circle markers with temperature-based color
+function ColoredDotsLayer({ points }) {
+    return (
+        <>
+            {points.map((p, idx) => {
+                const temp = p.T_C ?? 20; // Use 'T_C' as the temperature source
+                return (
+                    <CircleMarker
+                        key={idx}
+                        center={[p.latitude, p.longitude]}
+                        radius={14}
+                        color={getColor(temp)}
+                        fillOpacity={1}
+                        stroke={false}
+                    />
+                );
+            })}
+        </>
+    );
 }
 
 export default function Heatmap({ data }) {
     const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
-        // Set state only on client-side
         setIsClient(true);
     }, []);
 
     if (!data || data.length === 0) return <p>No data available</p>;
-
-    if (!isClient) {
-        return null; // Or you could show a loading spinner
-    }
+    if (!isClient) return null;
 
     const firstPoint = data[0];
     const center = [firstPoint.latitude, firstPoint.longitude];
@@ -82,7 +99,7 @@ export default function Heatmap({ data }) {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 />
-                <HeatLayer points={data} />
+                <ColoredDotsLayer points={data} />
             </MapContainer>
         </div>
     );

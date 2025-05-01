@@ -1,10 +1,18 @@
 {
   "app\\components\\posts.js -> ./Heatmap": {
-    "id": 8029,
+    "id": 5201,
     "files": [
       "static/css/d3e383b9ef67ddcb.css",
       "static/chunks/d0deef33.5551c27c44e59cec.js",
-      "static/chunks/29.8f1bc6c641d1772f.js"
+      "static/chunks/201.d4920868279bac11.js"
+    ]
+  },
+  "app\\components\\userPosts.js -> ./Heatmap": {
+    "id": 5201,
+    "files": [
+      "static/css/d3e383b9ef67ddcb.css",
+      "static/chunks/d0deef33.5551c27c44e59cec.js",
+      "static/chunks/201.d4920868279bac11.js"
     ]
   },
   "node_modules\\next\\dist\\client\\index.js -> ../pages/_app": {

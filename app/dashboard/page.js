@@ -1,7 +1,7 @@
-"use client"; // Mark this as a Client Component
+"use client";
 
 import { useState } from 'react';
-import Posts from "../components/posts"; // Import the Posts component
+import Posts from "../components/posts";
 
 export default function DashboardPage() {
     const [searchTerm, setSearchTerm] = useState('');

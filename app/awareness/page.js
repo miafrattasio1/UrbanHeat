@@ -72,10 +72,32 @@ export default function AboutPage() {
                             cooling benefits plants provide.
                         </li>
                     </ul>
-                    <h3 style={{color: "#2c3e50", marginTop: "30px"}}>What is Urban Heat Island Monitoring and mobile transects?</h3>
+                    <h3 style={{color: "#2c3e50", marginTop: "30px"}}>What are Urban Heat Island Monitoring and Mobile
+                        Transects?</h3>
                     <p>
-                        FILL THIS IN MORE A mobile transect is a research method for urban monitoring. This method uses portable devices, often attached to bikes or helmets, that collect environmental data along a pre-defined route through biking or walking. This approach provides detailed spatial information about the environmental variables.
+                        Urban Heat Island (UHI) monitoring involves collecting temperature and other environmental data across
+                        a city to better understand how heat is distributed in different neighborhoods. By identifying
+                        urban "hot spots", researchers and planners can develop more targeted strategies to reduce heat
+                        exposure and improve community resilience.
                     </p>
+                    <p>
+                        One innovative method for UHI monitoring is the use of <strong>mobile transects</strong>. A
+                        mobile transect involves traveling along a fixed route, often by bicycle, scooter, or on
+                        foot, while carrying portable sensors that record data such as air temperature, humidity, and light intensity, in real time.
+                    </p>
+                    <p>
+                        Compared to stationary weather stations, mobile transects offer a much higher spatial
+                        resolution. They allow researchers to observe how heat varies from block to block, identifying
+                        microclimates within the city. For example, a tree-lined street may be significantly cooler than
+                        a nearby area of tightly packed buildings.
+                    </p>
+                    <p>
+                        The data collected from mobile transects is extremely important for informing urban planning decisions, such
+                        as where to plant more trees, or install green roofs. It also helps
+                        communities advocate for environmental equity by highlighting areas that are disproportionately
+                        burdened by extreme heat.
+                    </p>
+
 
                 </div>
 
@@ -85,17 +107,17 @@ export default function AboutPage() {
                         <img
                             src="/park2.png"
                             alt="Park"
-                            style={{height: "220px", width: "auto", borderRadius: "8px"}}
+                            style={{height: "300px", width: "auto", borderRadius: "8px"}}
                         />
                         <img
                             src="/cityMap.png"
                             alt="City Map"
-                            style={{height: "220px", width: "auto", borderRadius: "8px"}}
+                            style={{height: "300px", width: "auto", borderRadius: "8px"}}
                         />
+
                     </div>
 
-                    <p><em>Pictured here is one of few green spaces in Cadiz, Spain. Here you can find many citizens
-                        escaping the dense city structures shown in the map image, sitting on benches in the shade.</em>
+                    <p><em>Pictured is a green space in Cádiz, Spain. Plaza de Mina offers a peaceful retreat from the surrounding dense urban landscape, as shown in the accompanying map. Locals can often be seen relaxing in the shade on hot, sunny days.</em>
                     </p>
 
 
@@ -128,7 +150,8 @@ export default function AboutPage() {
                         fontStyle: "italic",
                         color: "#34495e"
                     }}>
-                        "Placeholder quote................ ........... ............... ....... .......... ......... ........ ........ ...... ....... ......... ..... ............. ....... ...... ....." - Student
+                        "Placeholder quote................ ........... ............... ....... .......... .........
+                        ........ ........ ...... ....... ......... ..... ............. ....... ...... ....." - Student
                     </blockquote>
 
                     <blockquote style={{
@@ -138,7 +161,8 @@ export default function AboutPage() {
                         fontStyle: "italic",
                         color: "#34495e"
                     }}>
-                        "Placeholder quote...... .... .  .... . ..... . ...... ...... ......... ..... . ............ . ......... . ... .......... ........ . . ........ . . ........ ......... ......" - City
+                        "Placeholder quote...... .... . .... . ..... . ...... ...... ......... ..... . ............ .
+                        ......... . ... .......... ........ . . ........ . . ........ ......... ......" - City
                         Resident
                     </blockquote>
                     <h3 style={{color: "#2c3e50", marginBottom: "20px"}}>Key Survey Statistics</h3>
@@ -150,23 +174,43 @@ export default function AboutPage() {
                         <li><strong>57% of students</strong> placeholder stat</li>
                     </ul>
 
+                    <h3 style={{color: "#2c3e50", marginBottom: "20px"}}>Our Mobile Transects</h3>
                     <div style={{flex: 1.5}}>
-                        <div style={{display: "flex", justifyContent: "center", gap: "20px", marginTop: "30px"}}>
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "flex-start",
+                                gap: "20px",
+                                marginTop: "30px",
+                            }}
+                        >
                             <img
                                 src="/willBiking.png"
                                 alt="City Map"
                                 style={{height: "320px", width: "auto", borderRadius: "8px"}}
                             />
+                            <img
+                                src="/jorgePic.png"
+                                alt="Walking Transect"
+                                style={{height: "320px", width: "auto", borderRadius: "8px"}}
+                            />
                         </div>
 
-                        <p><em>Pictured here is William Gerlach performing a Mobile Transect by bike in Cadiz, Spain.</em>
+                        <p>
+                            <em>
+                                Pictured here is William Gerlach performing a Biking Mobile Transect by
+                                bike in Cadiz, Spain, and Jorge Saa performing a Walking Mobile Transect
+                                in Cadiz, Spain.
+                            </em>
                         </p>
                     </div>
 
-                    </div>
+
+                </div>
             </section>
 
 
         </div>
-);
+    );
 }
