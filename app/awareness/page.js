@@ -105,10 +105,17 @@ export default function AboutPage() {
                 <div style={{flex: 1.5}}>
                     <div style={{display: "flex", justifyContent: "center", gap: "20px", marginTop: "30px"}}>
                         <img
-                            src="/park2.png"
+                            src="/park3.png"
                             alt="Park"
-                            style={{height: "300px", width: "auto", borderRadius: "8px"}}
+                            style={{
+                                height: "300px",
+                                width: "320px", // Fixed smaller width
+                                objectFit: "cover", // Crops instead of scaling
+                                objectPosition: "center", // Keeps the center in view
+                                borderRadius: "8px"
+                            }}
                         />
+
                         <img
                             src="/cityMap.png"
                             alt="City Map"
@@ -125,7 +132,7 @@ export default function AboutPage() {
                     <p>
                         During our interviews with residents, students, and experts, we gathered firsthand insights on
                         how the Urban Heat Island effect is impacting lives and what actions are being taken. These
-                        quotes help illustrate the human side of the issue:
+                        quotes and stories help illustrate the human side of the issue:
                     </p>
 
                     <blockquote style={{
@@ -150,28 +157,14 @@ export default function AboutPage() {
                         fontStyle: "italic",
                         color: "#34495e"
                     }}>
-                        "Placeholder quote................ ........... ............... ....... .......... .........
-                        ........ ........ ...... ....... ......... ..... ............. ....... ...... ....." - Student
+                        Many interviewees are aware of the changes in heat, and concluded that extreme temperatures in the summer have led to what they call "horas muertas" ("dead hours"). This means that while the sun and the temperatures are at their apex, the streets will be "dead" as people will be home protecting themselves from the heat. These dead hours have led to loss in productivity and affected business hours.
                     </blockquote>
 
-                    <blockquote style={{
-                        borderLeft: "4px solid #3498db",
-                        paddingLeft: "15px",
-                        margin: "20px 0",
-                        fontStyle: "italic",
-                        color: "#34495e"
-                    }}>
-                        "Placeholder quote...... .... . .... . ..... . ...... ...... ......... ..... . ............ .
-                        ......... . ... .......... ........ . . ........ . . ........ ......... ......" - City
-                        Resident
-                    </blockquote>
                     <h3 style={{color: "#2c3e50", marginBottom: "20px"}}>Key Survey Statistics</h3>
                     <ul style={{listStyle: "disc", paddingLeft: "20px", color: "#34495e"}}>
-                        <li><strong>Only 51% of people</strong> placeholder stat</li>
-                        <li><strong>68% of respondents</strong> placeholder stat</li>
-                        <li><strong>72% of people</strong> placeholder stat.</li>
-                        <li><strong>1 in 3 residents</strong> placeholder stat.</li>
-                        <li><strong>57% of students</strong> placeholder stat</li>
+                        <li><strong>Only 20.7% of respondents</strong> believe they are well informed on Spain's policy on climate change.</li>
+                        <li><strong>89.7% of respondents</strong> indicated that they have adjusted their daily schedules due to high temperatures.</li>
+                        <li><strong>Only 51.7% of respondents</strong> say they have proper, working cooling systems at their place of work/study.</li>
                     </ul>
 
                     <h3 style={{color: "#2c3e50", marginBottom: "20px"}}>Our Mobile Transects</h3>

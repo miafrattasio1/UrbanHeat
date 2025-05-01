@@ -41,7 +41,7 @@ export default function ProjectPage() {
                         Email: gr-UrbanEnvC25@wpi.edu... describe who we are here.
                     </p>
                     <p>
-                        <strong>Joshua Bemis:</strong> info to come
+                        <strong>Joshua Bemis:</strong> Josh is an Aerospace Engineering BS/MS student from Haverhill, MA. Going to his family’s lake house every summer, Josh has developed an appreciation for the outdoors. Combining his technical skills learned at WPI with a passion for being outside, Josh was excited for the opportunity to work on a multidisciplinary project. Josh looks forward to collecting valuable data that could make an impact on environmental policy in Southern Spain.
                     </p>
                     <p>
                         <strong>Mia Frattasio:</strong> Mia is a Computer Science and Data Science student at WPI, with
