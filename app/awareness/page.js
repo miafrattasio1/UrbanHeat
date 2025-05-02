@@ -197,6 +197,16 @@ export default function AboutPage() {
                                 in Cadiz, Spain.
                             </em>
                         </p>
+
+                        <div style={{ display: "flex", justifyContent: "center", marginTop: "30px" }}>
+                            <video
+                                src="/bikeVideo.mp4"
+                                controls
+                                style={{ width: "90%", maxWidth: "800px", borderRadius: "8px" }}
+                            >
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
                     </div>
 
 
