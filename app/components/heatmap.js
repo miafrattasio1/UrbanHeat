@@ -4,67 +4,34 @@ import { MapContainer, TileLayer, CircleMarker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
 
-// Generate a color gradient with custom color ranges
-const generateGradient = () => {
-    const gradient = [];
+// Get a color between green (low) and red (high) based on temp and range
+const getColorFromRange = (temp, minTemp, maxTemp) => {
+    if (temp == null || isNaN(temp)) return "#888";
 
-    // Blues (-10°C to 0°C)
-    for (let i = -10; i <= 0; i++) {
-        const hue = 240 - ((240 - 210) * (i + 10)) / 10; // Blue to light blue
-        gradient.push(`hsl(${hue}, 100%, 50%)`);
-    }
+    if (minTemp === maxTemp) return "hsl(60, 100%, 50%)"; // fallback yellow if all temps are same
 
-    // Greens (0°C to 10°C)
-    for (let i = 0; i <= 10; i++) {
-        const hue = 120 - ((120 - 60) * i) / 10; // Green to yellow-green
-        gradient.push(`hsl(${hue}, 100%, 50%)`);
-    }
-
-    // Yellows (10°C to 20°C)
-    for (let i = 10; i <= 20; i++) {
-        const hue = 60 - ((60 - 30) * (i - 10)) / 10; // Yellow to yellow-orange
-        gradient.push(`hsl(${hue}, 100%, 50%)`);
-    }
-
-    // Oranges (20°C to 30°C)
-    for (let i = 20; i <= 30; i++) {
-        const hue = 30 - ((30 - 0) * (i - 20)) / 10; // Orange to red-orange
-        gradient.push(`hsl(${hue}, 100%, 50%)`);
-    }
-
-    // Reds (30°C to 40°C)
-    for (let i = 30; i <= 40; i++) {
-        const hue = (i - 30) * (360 / 10); // Red to deep red
-        gradient.push(`hsl(${hue}, 100%, 50%)`);
-    }
-
-    return gradient;
+    const ratio = (temp - minTemp) / (maxTemp - minTemp);
+    const hue = 120 - ratio * 120;
+    return `hsl(${hue}, 100%, 50%)`;
 };
 
-const temperatureGradient = generateGradient();
-
-const getColor = (tempCelsius) => {
-    if (tempCelsius == null || isNaN(tempCelsius)) return "#888"; // fallback gray
-
-    if (tempCelsius <= -10) return temperatureGradient[0];
-    if (tempCelsius >= 40) return temperatureGradient[temperatureGradient.length - 1];
-
-    const index = Math.round(tempCelsius + 10); // shift -10 to 0, 0 to 10, ..., 40 to 50
-    return temperatureGradient[index];
-};
-
-// Render circle markers with temperature-based color
+// Render circle markers with dynamic gradient color
 function ColoredDotsLayer({ points }) {
+    const temps = points.map((p) => p.T_C).filter((t) => t != null && !isNaN(t));
+    const minTemp = Math.min(...temps);
+    const maxTemp = Math.max(...temps);
+
     return (
         <>
             {points.map((p, idx) => {
-                const temp = p.T_C ?? 20; // Use 'T_C' as the temperature source
+                const temp = p.T_C ?? 20;
+                const color = getColorFromRange(temp, minTemp, maxTemp);
                 return (
                     <CircleMarker
                         key={idx}
                         center={[p.latitude, p.longitude]}
-                        radius={14}
-                        color={getColor(temp)}
+                        radius={2}
+                        color={color}
                         fillOpacity={1}
                         stroke={false}
                     />
@@ -91,7 +58,7 @@ export default function Heatmap({ data }) {
         <div style={{ height: "300px", width: "100%" }}>
             <MapContainer
                 center={center}
-                zoom={15}
+                zoom={26}
                 scrollWheelZoom={false}
                 style={{ height: "100%", width: "100%", borderRadius: "8px" }}
             >
