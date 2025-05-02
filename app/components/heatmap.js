@@ -30,7 +30,7 @@ function ColoredDotsLayer({ points }) {
                     <CircleMarker
                         key={idx}
                         center={[p.latitude, p.longitude]}
-                        radius={2}
+                        radius={8}
                         color={color}
                         fillOpacity={1}
                         stroke={false}
@@ -58,7 +58,7 @@ export default function Heatmap({ data }) {
         <div style={{ height: "300px", width: "100%" }}>
             <MapContainer
                 center={center}
-                zoom={26}
+                zoom={15}
                 scrollWheelZoom={false}
                 style={{ height: "100%", width: "100%", borderRadius: "8px" }}
             >
