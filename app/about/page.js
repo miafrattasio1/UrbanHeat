@@ -37,7 +37,7 @@ export default function ProjectPage() {
                         protecting the Earth and understanding the changes it's going through. This project gave her the
                         opportunity to combine her technical skills with something she cares about - Urban Heat Islands.
                     </p>
-                    <p><strong>William Gerlach:</strong> info to come</p>
+                    <p><strong>William Gerlach:</strong> Will is an Electrical Engineering student from Falmouth, MA. Growing up in a community increasingly affected by sea level rise and coastal erosion, he developed a strong interest in how infrastructure can evolve to help communities adapt to climate change. This project offered Will the opportunity to apply his engineering skills to real-world data collection, explore the impacts of climate on urban environments, and contribute to broader efforts toward more climate-resilient cities.</p>
                     <p>
                         <strong>Jorge Saa:</strong> Jorge is a Mechanical Engineering BS/MS student born in Santo Domingo,
                         Dominican Republic. Growing up in Panama City, Panama while visiting family in the countryside of
