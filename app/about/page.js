@@ -5,10 +5,30 @@ export default function ProjectPage() {
 
                 {/* Live Google Doc Preview */}
                 <section style={{ marginBottom: "40px" }}>
-                    <h2 style={{ color: "#2c3e50" }}>Live Report Preview</h2>
+                    <h2 style={{ color: "#2c3e50" }}>Manual Document Preview</h2>
+
+                    <div style={{ marginBottom: "10px" }}>
+                        <a
+                            href="https://docs.google.com/document/d/e/2PACX-1vSlb-batBXVobfSLbGpriAd2OLsOx_CL8nFEMcehUvmyROQdscmTyoUI7FLVAKOoOKRh8yIoQ_mUEY2/pub"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                display: "inline-block",
+                                backgroundColor: "#9ebbd8",
+                                color: "#fff",
+                                padding: "10px 16px",
+                                borderRadius: "6px",
+                                textDecoration: "none",
+                                fontWeight: "bold"
+                            }}
+                        >
+                            Open Full Report in New Tab
+                        </a>
+                    </div>
+
                     <div style={{ border: "1px solid #ccc", borderRadius: "8px", overflow: "hidden" }}>
                         <iframe
-                            src="https://docs.google.com/document/d/e/2PACX-1vSmFAKE_EXAMPLE_URL/pub?embedded=true"
+                            src="https://docs.google.com/document/d/e/2PACX-1vSlb-batBXVobfSLbGpriAd2OLsOx_CL8nFEMcehUvmyROQdscmTyoUI7FLVAKOoOKRh8yIoQ_mUEY2/pub?embedded=true"
                             style={{ width: "100%", height: "600px", border: "none" }}
                             title="Urban Environment IQP Report"
                         ></iframe>
@@ -47,6 +67,7 @@ export default function ProjectPage() {
                         opportunity to do so in a continent and region different to his own while learning as he worked on a team.
                     </p>
                 </section>
+
 
                 {/* Sponsor Section */}
                 <section style={{ marginBottom: "40px" }}>
